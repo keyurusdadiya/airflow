@@ -805,13 +805,13 @@ class DbtCloudHook(HttpHook):
         job_run_info = JobRunInfo(account_id=account_id, run_id=run_id)
         job_run_status = self.get_job_run_status(**job_run_info)
 
-        start_time = time.time()
+        start_time = time.monotonic()
 
         while (
             not DbtCloudJobRunStatus.is_terminal(job_run_status) and job_run_status not in expected_statuses
         ):
             # Check if the job-run duration has exceeded the ``timeout`` configured.
-            if start_time + timeout < time.time():
+            if start_time + timeout < time.monotonic():
                 raise DbtCloudJobRunException(
                     f"Job run {run_id} has not reached a terminal status after {timeout} seconds."
                 )

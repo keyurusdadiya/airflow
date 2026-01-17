@@ -94,13 +94,13 @@ class _CommonCLIUvicornTestClass:
             os.remove(pidfile_monitor)
 
     def _wait_pidfile(self, pidfile):
-        start_time = time.time()
+        start_time = time.monotonic()
         while True:
             try:
                 with open(pidfile) as file:
                     return int(file.read())
             except Exception:
-                if start_time - time.time() > 60:
+                if start_time - time.monotonic() > 60:
                     raise
                 console.print(f"[blue]Waiting for pidfile {pidfile} to be created ...")
                 time.sleep(1)

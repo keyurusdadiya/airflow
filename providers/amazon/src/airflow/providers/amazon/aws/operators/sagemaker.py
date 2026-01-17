@@ -1192,7 +1192,7 @@ class SageMakerTrainingOperator(SageMakerBaseOperator):
 
             if self.print_log:
                 instance_count = description["ResourceConfig"]["InstanceCount"]
-                last_describe_job_call = time.time()
+                last_describe_job_call = time.monotonic()
                 job_already_completed = status not in self.hook.non_terminal_states
                 _, description, last_describe_job_call = self.hook.describe_training_job_with_log(
                     self.config["TrainingJobName"],

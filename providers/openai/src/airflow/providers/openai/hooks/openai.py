@@ -455,9 +455,9 @@ class OpenAIHook(BaseHook):
         :param timeout: Optional. How many seconds wait for batch to be ready.
             Used only if not ran in deferred operator.
         """
-        start = time.time()
+        start = time.monotonic()
         while True:
-            if start + timeout < time.time():
+            if start + timeout < time.monotonic():
                 self.cancel_batch(batch_id=batch_id)
                 raise OpenAIBatchTimeout(f"Timeout: OpenAI Batch {batch_id} is not ready after {timeout}s")
             batch = self.get_batch(batch_id=batch_id)

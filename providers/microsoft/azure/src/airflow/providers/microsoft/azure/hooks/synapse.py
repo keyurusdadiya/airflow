@@ -188,14 +188,14 @@ class AzureSynapseHook(BaseHook):
 
         """
         job_run_status = self.get_job_run_status()
-        start_time = time.time()
+        start_time = time.monotonic()
 
         while (
             job_run_status not in AzureSynapseSparkBatchRunStatus.TERMINAL_STATUSES
             and job_run_status not in expected_statuses
         ):
             # Check if the job-run duration has exceeded the ``timeout`` configured.
-            if start_time + timeout < time.time():
+            if start_time + timeout < time.monotonic():
                 raise AirflowTaskTimeout(
                     f"Job {job_id} has not reached a terminal status after {timeout} seconds."
                 )
@@ -409,13 +409,13 @@ class AzureSynapsePipelineHook(BaseAzureSynapseHook):
         """
         pipeline_run_status = self.get_pipeline_run_status(run_id=run_id)
         executed_after_token_refresh = True
-        start_time = time.time()
+        start_time = time.monotonic()
 
         while (
             pipeline_run_status not in AzureSynapsePipelineRunStatus.TERMINAL_STATUSES
             and pipeline_run_status not in expected_statuses
         ):
-            if start_time + timeout < time.time():
+            if start_time + timeout < time.monotonic():
                 raise AzureSynapsePipelineRunException(
                     f"Pipeline run {run_id} has not reached a terminal status after {timeout} seconds."
                 )

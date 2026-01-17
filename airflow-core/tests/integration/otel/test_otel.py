@@ -1032,11 +1032,11 @@ class TestOtelIntegration:
 
             run_id = unpause_trigger_dag_and_get_run_id(dag_id=dag_id)
 
-            deadline = time.time() + self.max_wait_seconds_for_pause
+            deadline = time.monotonic() + self.max_wait_seconds_for_pause
 
             while True:
                 # To avoid get stuck waiting.
-                if time.time() > deadline:
+                if time.monotonic() > deadline:
                     raise TimeoutError(
                         f"Timed out waiting for 'pause' to appear in {self.control_file}, after {self.max_wait_seconds_for_pause} seconds."
                     )
@@ -1149,11 +1149,11 @@ class TestOtelIntegration:
 
             run_id = unpause_trigger_dag_and_get_run_id(dag_id=dag_id)
 
-            deadline = time.time() + self.max_wait_seconds_for_pause
+            deadline = time.monotonic() + self.max_wait_seconds_for_pause
 
             while True:
                 # To avoid get stuck waiting.
-                if time.time() > deadline:
+                if time.monotonic() > deadline:
                     raise TimeoutError(
                         f"Timed out waiting for 'pause' to appear in {self.control_file}, after {self.max_wait_seconds_for_pause} seconds."
                     )
@@ -1244,11 +1244,11 @@ class TestOtelIntegration:
 
             run_id = unpause_trigger_dag_and_get_run_id(dag_id=dag_id)
 
-            deadline = time.time() + self.max_wait_seconds_for_pause
+            deadline = time.monotonic() + self.max_wait_seconds_for_pause
 
             while True:
                 # To avoid get stuck waiting.
-                if time.time() > deadline:
+                if time.monotonic() > deadline:
                     raise TimeoutError(
                         f"Timed out waiting for 'pause' to appear in {self.control_file}, after {self.max_wait_seconds_for_pause} seconds."
                     )
@@ -1346,11 +1346,11 @@ class TestOtelIntegration:
 
             run_id = unpause_trigger_dag_and_get_run_id(dag_id=dag_id)
 
-            deadline = time.time() + self.max_wait_seconds_for_pause
+            deadline = time.monotonic() + self.max_wait_seconds_for_pause
 
             while True:
                 # To avoid get stuck waiting.
-                if time.time() > deadline:
+                if time.monotonic() > deadline:
                     raise TimeoutError(
                         f"Timed out waiting for 'pause' to appear in {self.control_file}, after {self.max_wait_seconds_for_pause} seconds."
                     )

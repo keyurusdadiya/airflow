@@ -83,7 +83,7 @@ class TraceQueries:
         :param executemany: whether many statements executed
         :return:
         """
-        conn.info.setdefault("query_start_time", []).append(time.time())
+        conn.info.setdefault("query_start_time", []).append(time.monotonic())
         self.query_count += 1
 
     def after_cursor_execute(
@@ -106,7 +106,7 @@ class TraceQueries:
         :param executemany: whether many statements executed
         :return:
         """
-        total = time.time() - conn.info["query_start_time"].pop()
+        total = time.monotonic() - conn.info["query_start_time"].pop()
         file_names = [
             f"{f.filename}:{f.name}:{f.lineno}"
             for f in traceback.extract_stack()
@@ -115,7 +115,7 @@ class TraceQueries:
         file_name = file_names[-1] if file_names else ""
         stack = [f for f in traceback.extract_stack() if "sqlalchemy" not in f.filename]
         stack_info = " > ".join([f"{f.filename.rpartition('/')[-1]}:{f.name}:{f.lineno}" for f in stack][-7:])
-        conn.info.setdefault("query_start_time", []).append(time.time())
+        conn.info.setdefault("query_start_time", []).append(time.monotonic())
 
         output_parts = []
         if self.display_num:

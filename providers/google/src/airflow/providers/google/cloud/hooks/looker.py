@@ -156,7 +156,7 @@ class LookerHook(BaseHook):
         self.log.info("Waiting for PDT materialization job to complete. Job id: %s.", materialization_id)
 
         status = None
-        start = time.time()
+        start = time.monotonic()
 
         while status not in (
             JobStatus.DONE.value,
@@ -164,7 +164,7 @@ class LookerHook(BaseHook):
             JobStatus.CANCELLED.value,
             JobStatus.UNKNOWN.value,
         ):
-            if timeout and start + timeout < time.time():
+            if timeout and start + timeout < time.monotonic():
                 self.stop_pdt_build(materialization_id=materialization_id)
                 raise AirflowException(
                     f"Timeout: PDT materialization job is not ready after {timeout}s. "

@@ -292,7 +292,7 @@ class DagFileProcessorManager(LoggingMixin):
 
     def _scan_stale_dags(self):
         """Scan and deactivate DAGs which are no longer present in files."""
-        now = time.time()
+        now = time.monotonic()
         elapsed_time_since_refresh = now - self._last_deactivate_stale_dags_time
         if elapsed_time_since_refresh > self.parsing_cleanup_interval:
             last_parsed = {
@@ -301,7 +301,7 @@ class DagFileProcessorManager(LoggingMixin):
                 if stat.last_finish_time
             }
             self.deactivate_stale_dags(last_parsed=last_parsed)
-            self._last_deactivate_stale_dags_time = time.time()
+            self._last_deactivate_stale_dags_time = time.monotonic()
 
     @provide_session
     def deactivate_stale_dags(
@@ -357,7 +357,7 @@ class DagFileProcessorManager(LoggingMixin):
         known_files: dict[str, set[DagFileInfo]] = {}
 
         while True:
-            loop_start_time = time.time()
+            loop_start_time = time.monotonic()
 
             self.heartbeat()
 
@@ -396,7 +396,7 @@ class DagFileProcessorManager(LoggingMixin):
                 )
                 break
 
-            loop_duration = time.time() - loop_start_time
+            loop_duration = time.monotonic() - loop_start_time
             if loop_duration < 1:
                 poll_time = 1 - loop_duration
             else:
@@ -517,7 +517,7 @@ class DagFileProcessorManager(LoggingMixin):
 
         # we don't need to check if it's time to refresh every loop - that is way too often
         next_check = self._bundles_last_refreshed + self.bundle_refresh_check_interval
-        now_seconds = time.time()
+        now_seconds = time.monotonic()
         if now_seconds < next_check and not self._force_refresh_bundles:
             self.log.debug(
                 "Not time to check if DAG Bundles need refreshed yet - skipping. Next check in %.2f seconds",
@@ -674,10 +674,10 @@ class DagFileProcessorManager(LoggingMixin):
 
     def print_stats(self, known_files: dict[str, set[DagFileInfo]]):
         """Occasionally print out stats about how fast the files are getting processed."""
-        if 0 < self.print_stats_interval < time.time() - self.last_stat_print_time:
+        if 0 < self.print_stats_interval < time.monotonic() - self.last_stat_print_time:
             if known_files:
                 self._log_file_processing_stats(known_files=known_files)
-            self.last_stat_print_time = time.time()
+            self.last_stat_print_time = time.monotonic()
 
     @provide_session
     def clear_orphaned_import_errors(
@@ -732,7 +732,7 @@ class DagFileProcessorManager(LoggingMixin):
 
         rows = []
         utcnow = timezone.utcnow()
-        now = time.time()
+        now = time.monotonic()
 
         for files in known_files.values():
             for file in files:
@@ -866,7 +866,7 @@ class DagFileProcessorManager(LoggingMixin):
 
             # Collect the DAGS and import errors into the DB, emit metrics etc.
             self._file_stats[file] = process_parse_results(
-                run_duration=time.time() - proc.start_time,
+                run_duration=time.monotonic() - proc.start_time,
                 finish_time=timezone.utcnow(),
                 run_count=self._file_stats[file].run_count,
                 bundle_name=file.bundle_name,
@@ -1078,7 +1078,7 @@ class DagFileProcessorManager(LoggingMixin):
 
     def _kill_timed_out_processors(self):
         """Kill any file processors that timeout to defend against process hangs."""
-        now = time.time()
+        now = time.monotonic()
         processors_to_remove = []
         for file, processor in self._processors.items():
             duration = now - processor.start_time

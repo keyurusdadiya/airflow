@@ -110,11 +110,11 @@ class StandaloneCommand:
                 # Print info banner when all components are ready and the
                 # delay has passed
                 if not self.ready_time and self.is_ready():
-                    self.ready_time = time.time()
+                    self.ready_time = time.monotonic()
                 if (
                     not shown_ready
                     and self.ready_time
-                    and time.time() - self.ready_time > self.ready_delay
+                    and time.monotonic() - self.ready_time > self.ready_delay
                 ):
                     self.print_ready()
                     shown_ready = True

@@ -68,11 +68,11 @@ class DataprocJobSensor(BaseSensorOperator):
         self.start_sensor_time: float | None = None
 
     def execute(self, context: Context) -> None:
-        self.start_sensor_time = time.time()
+        self.start_sensor_time = time.monotonic()
         super().execute(context)
 
     def _duration(self):
-        return time.time() - self.start_sensor_time
+        return time.monotonic() - self.start_sensor_time
 
     def poke(self, context: Context) -> bool:
         hook = DataprocHook(gcp_conn_id=self.gcp_conn_id)
@@ -150,11 +150,11 @@ class DataprocBatchSensor(BaseSensorOperator):
         self.start_sensor_time: float | None = None
 
     def execute(self, context: Context) -> None:
-        self.start_sensor_time = time.time()
+        self.start_sensor_time = time.monotonic()
         super().execute(context)
 
     def _duration(self):
-        return time.time() - self.start_sensor_time
+        return time.monotonic() - self.start_sensor_time
 
     def poke(self, context: Context) -> bool:
         hook = DataprocHook(gcp_conn_id=self.gcp_conn_id)
