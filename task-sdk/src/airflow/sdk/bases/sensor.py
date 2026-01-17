@@ -192,10 +192,10 @@ class BaseSensorOperator(BaseOperator):
                 return (timezone.utcnow() - start_date).total_seconds()
 
         else:
-            started_at = start_monotonic = time.monotonic()
+            started_at = start_monotonic = time.time()
 
             def run_duration() -> float:
-                return time.monotonic() - start_monotonic
+                return time.time() - start_monotonic
 
         poke_count = 1
 

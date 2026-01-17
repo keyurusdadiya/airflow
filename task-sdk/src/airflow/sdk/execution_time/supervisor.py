@@ -512,7 +512,7 @@ class WatchedSubprocess:
             stdin=read_requests,
             process=psutil.Process(pid),
             process_log=logger,
-            start_time=time.monotonic(),
+            start_time=time.time(),
             **constructor_kwargs,
         )
 
@@ -701,7 +701,7 @@ class WatchedSubprocess:
             try:
                 self._process.send_signal(sig)
 
-                start = time.monotonic()
+                start = time.time()
                 end = start + escalation_delay
                 now = start
 
@@ -716,7 +716,7 @@ class WatchedSubprocess:
                         log.info("Process exited", pid=self.pid, exit_code=exit_code, signal_sent=sig.name)
                         return
 
-                    now = time.monotonic()
+                    now = time.time()
 
                 msg = "Process did not terminate in time"
                 if sig != escalation_path[-1]:
@@ -804,7 +804,7 @@ class WatchedSubprocess:
             if raise_on_timeout:
                 raise
         else:
-            self._process_exit_monotonic = time.monotonic()
+            self._process_exit_monotonic = time.time()
 
             if expect_signal is not None and self._exit_code == -expect_signal:
                 # Bypass logging, the caller expected us to exit with this
@@ -1006,7 +1006,7 @@ class ActivitySubprocess(WatchedSubprocess):
             # tell us "no, stop!" for any reason)
             ti_context = self.client.task_instances.start(ti.id, self.pid, start_date)
             self._should_retry = ti_context.should_retry
-            self._last_successful_heartbeat = time.monotonic()
+            self._last_successful_heartbeat = time.time()
         except Exception:
             # On any error kill that subprocess!
             self.kill(signal.SIGKILL)
@@ -1087,7 +1087,7 @@ class ActivitySubprocess(WatchedSubprocess):
         - Sends heartbeats to ensure the process is alive and checks if the subprocess has exited.
         """
         while self._exit_code is None or self._open_sockets:
-            last_heartbeat_ago = time.monotonic() - self._last_successful_heartbeat
+            last_heartbeat_ago = time.time() - self._last_successful_heartbeat
             # Monitor the task to see if it's done. Wait in a syscall (`select`) for as long as possible
             # so we notice the subprocess finishing as quick as we can.
             max_wait_time = max(
@@ -1105,7 +1105,7 @@ class ActivitySubprocess(WatchedSubprocess):
             if self._exit_code is not None and self._open_sockets:
                 if (
                     self._process_exit_monotonic
-                    and time.monotonic() - self._process_exit_monotonic > SOCKET_CLEANUP_TIMEOUT
+                    and time.time() - self._process_exit_monotonic > SOCKET_CLEANUP_TIMEOUT
                 ):
                     log.warning(
                         "Process exited with open sockets; cleaning up after timeout",
@@ -1130,7 +1130,7 @@ class ActivitySubprocess(WatchedSubprocess):
             return
         if (
             self._task_end_time_monotonic
-            and (time.monotonic() - self._task_end_time_monotonic) > TASK_OVERTIME_THRESHOLD
+            and (time.time() - self._task_end_time_monotonic) > TASK_OVERTIME_THRESHOLD
         ):
             log.warning(
                 "Task success overtime reached; terminating process. "
@@ -1143,7 +1143,7 @@ class ActivitySubprocess(WatchedSubprocess):
     def _send_heartbeat_if_needed(self):
         """Send a heartbeat to the client if heartbeat interval has passed."""
         # Respect the minimum interval between heartbeat attempts
-        if (time.monotonic() - self._last_heartbeat_attempt) < MIN_HEARTBEAT_INTERVAL:
+        if (time.time() - self._last_heartbeat_attempt) < MIN_HEARTBEAT_INTERVAL:
             return
 
         if self._terminal_state:
@@ -1151,11 +1151,11 @@ class ActivitySubprocess(WatchedSubprocess):
             # heartbeat
             return
 
-        self._last_heartbeat_attempt = time.monotonic()
+        self._last_heartbeat_attempt = time.time()
         try:
             self.client.task_instances.heartbeat(self.id, pid=self._process.pid)
             # Update the last heartbeat time on success
-            self._last_successful_heartbeat = time.monotonic()
+            self._last_successful_heartbeat = time.time()
 
             # Reset the counter on success
             self.failed_heartbeats = 0
@@ -1232,11 +1232,11 @@ class ActivitySubprocess(WatchedSubprocess):
         dump_opts = {}
         if isinstance(msg, TaskState):
             self._terminal_state = msg.state
-            self._task_end_time_monotonic = time.monotonic()
+            self._task_end_time_monotonic = time.time()
             self._rendered_map_index = msg.rendered_map_index
         elif isinstance(msg, SucceedTask):
             self._terminal_state = msg.state
-            self._task_end_time_monotonic = time.monotonic()
+            self._task_end_time_monotonic = time.time()
             self._rendered_map_index = msg.rendered_map_index
             self.client.task_instances.succeed(
                 id=self.id,
@@ -1247,7 +1247,7 @@ class ActivitySubprocess(WatchedSubprocess):
             )
         elif isinstance(msg, RetryTask):
             self._terminal_state = msg.state
-            self._task_end_time_monotonic = time.monotonic()
+            self._task_end_time_monotonic = time.time()
             self._rendered_map_index = msg.rendered_map_index
             self.client.task_instances.retry(
                 id=self.id,
@@ -2050,7 +2050,7 @@ def supervise(
         close_client = True
         log.debug("Connecting to execution API server", server=server)
 
-    start = time.monotonic()
+    start = time.time()
 
     # TODO: Use logging providers to handle the chunked upload for us etc.
     logger: FilteringBoundLogger | None = None
@@ -2079,7 +2079,7 @@ def supervise(
         )
 
         exit_code = process.wait()
-        end = time.monotonic()
+        end = time.time()
         log.info(
             "Task finished",
             task_instance_id=str(ti.id),

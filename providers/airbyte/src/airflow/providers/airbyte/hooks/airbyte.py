@@ -148,9 +148,9 @@ class AirbyteHook(BaseHook):
             Used only if ``asynchronous`` is False.
         """
         state = None
-        start = time.monotonic()
+        start = time.time()
         while True:
-            if timeout and start + timeout < time.monotonic():
+            if timeout and start + timeout < time.time():
                 self.log.debug("Canceling job...")
                 self.cancel_job(job_id=(int(job_id)))
                 raise AirflowException(f"Timeout: Airbyte job {job_id} is not ready after {timeout}s")

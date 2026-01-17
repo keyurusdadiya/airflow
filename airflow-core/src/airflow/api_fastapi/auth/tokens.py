@@ -146,14 +146,14 @@ class JWKS:
             log.debug(
                 "Fetching JWKS",
                 url=self.url,
-                last_fetched_secs_ago=int(time.monotonic() - self.fetched_at) if self.fetched_at else None,
+                last_fetched_secs_ago=int(time.time() - self.fetched_at) if self.fetched_at else None,
             )
             if TYPE_CHECKING:
                 assert self.url
-            self.last_fetch_attempt_at = int(time.monotonic())
+            self.last_fetch_attempt_at = int(time.time())
             response = await self.client.get(self.url)
             response.raise_for_status()
-            self.fetched_at = int(time.monotonic())
+            self.fetched_at = int(time.time())
             await response.aread()
             await response.aclose()
             return response.json()
@@ -165,7 +165,7 @@ class JWKS:
         try:
             with open(self.url) as jwks_file:
                 content = json.load(jwks_file)
-            self.fetched_at = int(time.monotonic())
+            self.fetched_at = int(time.time())
             return content
         except Exception:
             log.exception("Failed to read local JWKS", url=self.url)
@@ -186,7 +186,7 @@ class JWKS:
             return not self._jwks
         # For remote fetches we check if the JWKS is not loaded (fetched_at = 0) or if the last fetch was more than
         # refresh_interval_secs ago and the last fetch attempt was more than refresh_retry_interval_secs ago
-        now = time.monotonic()
+        now = time.time()
         return self.refresh_jwks and (
             not self._jwks
             or (
@@ -217,7 +217,7 @@ class JWKS:
         if self.fetched_at == 0:
             raise RuntimeError("JWKS never fetched")
 
-        last_successful_fetch = time.monotonic() - self.fetched_at
+        last_successful_fetch = time.time() - self.fetched_at
         if last_successful_fetch > 3 * self.refresh_interval_secs:
             raise RuntimeError(f"JWKS last fetched {last_successful_fetch}s ago")
 

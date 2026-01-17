@@ -596,7 +596,7 @@ class TestDagFileProcessorManager:
     def test_kill_timed_out_processors_kill(self):
         manager = DagFileProcessorManager(max_runs=1, processor_timeout=5)
         # Set start_time to ensure timeout occurs: start_time = current_time - (timeout + 1) = always (timeout + 1) seconds
-        start_time = time.monotonic() - manager.processor_timeout - 1
+        start_time = time.time() - manager.processor_timeout - 1
         processor, _ = self.mock_processor(start_time=start_time)
         manager._processors = {
             DagFileInfo(

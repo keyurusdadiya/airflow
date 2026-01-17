@@ -1704,14 +1704,14 @@ class DataplexHook(GoogleBaseHook, OperationHelper):
         :param result_timeout: Value in seconds for which operator will wait for the Data Quality scan result.
             Throws exception if there is no result found after specified amount of seconds.
         """
-        start = time.monotonic()
+        start = time.time()
         state = None
         while state not in (
             DataScanJob.State.CANCELLED,
             DataScanJob.State.FAILED,
             DataScanJob.State.SUCCEEDED,
         ):
-            if result_timeout and start + result_timeout < time.monotonic():
+            if result_timeout and start + result_timeout < time.time():
                 raise AirflowDataQualityScanResultTimeoutException(
                     f"Timeout: Data Quality scan {job_id} is not ready after {result_timeout}s"
                 )

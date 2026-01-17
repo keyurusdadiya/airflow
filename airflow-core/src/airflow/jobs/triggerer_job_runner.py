@@ -894,7 +894,7 @@ class TriggerRunner:
 
         watchdog = asyncio.create_task(self.block_watchdog())
 
-        last_status = time.monotonic()
+        last_status = time.time()
         try:
             while not self.stop:
                 # Raise exceptions from the tasks
@@ -911,7 +911,7 @@ class TriggerRunner:
                 # Sleep for a bit
                 await asyncio.sleep(1)
                 # Every minute, log status
-                if (now := time.monotonic()) - last_status >= 60:
+                if (now := time.time()) - last_status >= 60:
                     watchers = len([trigger for trigger in self.triggers.values() if trigger["is_watcher"]])
                     triggers = len(self.triggers) - watchers
                     self.log.info("%i triggers currently running", triggers)
@@ -1119,11 +1119,11 @@ class TriggerRunner:
         we can at least detect the top-level problem.
         """
         while not self.stop:
-            last_run = time.monotonic()
+            last_run = time.time()
             await asyncio.sleep(0.1)
             # We allow a generous amount of buffer room for now, since it might
             # be a busy event loop.
-            time_elapsed = time.monotonic() - last_run
+            time_elapsed = time.time() - last_run
             if time_elapsed > 0.2:
                 await self.log.ainfo(
                     "Triggerer's async thread was blocked for %.2f seconds, "

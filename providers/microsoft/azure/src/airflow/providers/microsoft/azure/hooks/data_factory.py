@@ -831,14 +831,14 @@ class AzureDataFactoryHook(BaseHook):
         """
         pipeline_run_status = self.get_pipeline_run_status(run_id, resource_group_name, factory_name)
 
-        start_time = time.monotonic()
+        start_time = time.time()
 
         while (
             pipeline_run_status not in AzureDataFactoryPipelineRunStatus.TERMINAL_STATUSES
             and pipeline_run_status not in expected_statuses
         ):
             # Check if the pipeline-run duration has exceeded the ``timeout`` configured.
-            if start_time + timeout < time.monotonic():
+            if start_time + timeout < time.time():
                 raise AzureDataFactoryPipelineRunException(
                     f"Pipeline run {run_id} has not reached a terminal status after {timeout} seconds."
                 )

@@ -621,9 +621,9 @@ class SageMakerHook(AwsBaseHook):
 
         if state == LogState.JOB_COMPLETE:
             state = LogState.COMPLETE
-        elif time.monotonic() - last_describe_job_call >= 30:
+        elif time.time() - last_describe_job_call >= 30:
             description = self.describe_training_job(job_name)
-            last_describe_job_call = time.monotonic()
+            last_describe_job_call = time.time()
 
             if secondary_training_status_changed(description, last_description):
                 self.log.info(secondary_training_status_message(description, last_description))
@@ -816,7 +816,7 @@ class SageMakerHook(AwsBaseHook):
         # Notes:
         # - The JOB_COMPLETE state forces us to do an extra pause and read any items that
         # got to Cloudwatch after the job was marked complete.
-        last_describe_job_call = time.monotonic()
+        last_describe_job_call = time.time()
         last_description = description
 
         while True:

@@ -60,7 +60,7 @@ def cache_token_decorator(get_subject_token_method):
         cache_key = supplier_instance.get_subject_key()
         token: dict[str, str | float] = {}
 
-        if cache_key not in cache or cache[cache_key]["expiration_time"] < time.monotonic():
+        if cache_key not in cache or cache[cache_key]["expiration_time"] < time.time():
             supplier_instance.log.info("OIDC token missing or expired")
             try:
                 access_token, expires_in = get_subject_token_method(supplier_instance, *args, **kwargs)
@@ -71,7 +71,7 @@ def cache_token_decorator(get_subject_token_method):
                 supplier_instance.log.error("Failed retrieving new OIDC Token from IdP")
                 raise
 
-            expiration_time = time.monotonic() + float(expires_in)
+            expiration_time = time.time() + float(expires_in)
             token["access_token"] = access_token
             token["expiration_time"] = expiration_time
             cache[cache_key] = token

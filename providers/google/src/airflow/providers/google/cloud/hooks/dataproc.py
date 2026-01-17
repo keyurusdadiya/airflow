@@ -910,10 +910,10 @@ class DataprocHook(GoogleBaseHook):
         if region is None:
             raise TypeError("missing 1 required keyword argument: 'region'")
         state = None
-        start = time.monotonic()
+        start = time.time()
         while state not in (JobStatus.State.ERROR, JobStatus.State.DONE, JobStatus.State.CANCELLED):
             self.log.debug("Waiting for job %s to complete", job_id)
-            if timeout and start + timeout < time.monotonic():
+            if timeout and start + timeout < time.time():
                 raise AirflowException(f"Timeout: dataproc job {job_id} is not ready after {timeout}s")
             self.log.debug("Sleeping for %s seconds", wait_time)
             time.sleep(wait_time)

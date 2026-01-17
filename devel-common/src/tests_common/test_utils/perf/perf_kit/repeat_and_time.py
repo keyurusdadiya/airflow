@@ -41,11 +41,11 @@ def timing(repeat_count: int = 1):
     :param repeat_count: If passed, the result will be divided by the value.
     """
     result = TimingResult()
-    result.start_time = time.monotonic()
+    result.start_time = time.time()
     try:
         yield result
     finally:
-        end_time = time.monotonic()
+        end_time = time.time()
         diff = (end_time - result.start_time) * 1000.0
 
         result.end_time = end_time

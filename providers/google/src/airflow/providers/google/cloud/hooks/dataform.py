@@ -69,13 +69,13 @@ class DataformHook(GoogleBaseHook):
         if region is None:
             raise TypeError("missing 1 required keyword argument: 'region'")
         state = None
-        start = time.monotonic()
+        start = time.time()
         while state not in (
             WorkflowInvocation.State.FAILED,
             WorkflowInvocation.State.SUCCEEDED,
             WorkflowInvocation.State.CANCELLED,
         ):
-            if timeout and start + timeout < time.monotonic():
+            if timeout and start + timeout < time.time():
                 raise AirflowException(
                     f"Timeout: workflow invocation {workflow_invocation_id} is not ready after {timeout}s"
                 )

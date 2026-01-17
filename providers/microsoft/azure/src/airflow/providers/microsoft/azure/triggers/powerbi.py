@@ -195,8 +195,8 @@ class PowerBITrigger(BasePowerBITrigger):
 
         try:
             dataset_refresh_status, dataset_refresh_error = await fetch_refresh_status_and_error()
-            start_time = time.monotonic()
-            while start_time + self.timeout > time.monotonic():
+            start_time = time.time()
+            while start_time + self.timeout > time.time():
                 dataset_refresh_status, dataset_refresh_error = await fetch_refresh_status_and_error()
 
                 if dataset_refresh_status == PowerBIDatasetRefreshStatus.COMPLETED:

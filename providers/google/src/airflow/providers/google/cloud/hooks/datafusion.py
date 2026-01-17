@@ -113,9 +113,9 @@ class DataFusionHook(GoogleBaseHook):
         """Poll for pipeline state and raises an exception if the state fails or times out."""
         failure_states = failure_states or FAILURE_STATES
         success_states = success_states or SUCCESS_STATES
-        start_time = time.monotonic()
+        start_time = time.time()
         current_state = None
-        while time.monotonic() - start_time < timeout:
+        while time.time() - start_time < timeout:
             try:
                 workflow = self.get_pipeline_workflow(
                     pipeline_name=pipeline_name,

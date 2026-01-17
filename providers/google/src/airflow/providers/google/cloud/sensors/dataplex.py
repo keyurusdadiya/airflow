@@ -191,8 +191,8 @@ class DataplexDataQualityJobStatusSensor(BaseSensorOperator):
 
     def _duration(self):
         if not self.start_sensor_time:
-            self.start_sensor_time = time.monotonic()
-        return time.monotonic() - self.start_sensor_time
+            self.start_sensor_time = time.time()
+        return time.time() - self.start_sensor_time
 
     def poke(self, context: Context) -> bool:
         self.log.info("Waiting for job %s to be %s", self.job_id, DataScanJob.State.SUCCEEDED)
@@ -304,8 +304,8 @@ class DataplexDataProfileJobStatusSensor(BaseSensorOperator):
 
     def _duration(self):
         if not self.start_sensor_time:
-            self.start_sensor_time = time.monotonic()
-        return time.monotonic() - self.start_sensor_time
+            self.start_sensor_time = time.time()
+        return time.time() - self.start_sensor_time
 
     def poke(self, context: Context) -> bool:
         self.log.info("Waiting for job %s to be %s", self.job_id, DataScanJob.State.SUCCEEDED)
