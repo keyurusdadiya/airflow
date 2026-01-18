@@ -348,10 +348,17 @@ class TestDbtCloudRunJobOperator:
             # which is emulating time which we spent in a loop
             overall_delta = timedelta(seconds=seconds) + timedelta(microseconds=42)
             time_machine.shift(overall_delta)
+        
+        current = 1_000_000.0
+
+        def mock_monotonic():
+            
+            return current
 
         with (
             patch.object(DbtCloudHook, "get_job_run") as mock_get_job_run,
             patch("airflow.providers.dbt.cloud.hooks.dbt.time.sleep", side_effect=fake_sleep),
+            patch("airflow.providers.dbt.cloud.hooks.dbt.time.monotonic", side_effect=mock_monotonic),
         ):
             mock_get_job_run.return_value.json.return_value = {
                 "data": {"status": job_run_status, "id": RUN_ID}

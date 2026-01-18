@@ -667,8 +667,6 @@ class TestWatchedSubprocess:
         current = 1_000_000.0
 
         def mock_monotonic():
-            nonlocal current
-
             return current
 
         bundle_info = BundleInfo(name="my-bundle", version=None)
