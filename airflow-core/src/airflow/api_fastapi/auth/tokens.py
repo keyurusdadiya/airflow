@@ -150,7 +150,7 @@ class JWKS:
             )
             if TYPE_CHECKING:
                 assert self.url
-            self.last_fetch_attempt_at = int(time.time())
+            self.last_fetch_attempt_at = int(time.monotonic())
             response = await self.client.get(self.url)
             response.raise_for_status()
             self.fetched_at = int(time.monotonic())
